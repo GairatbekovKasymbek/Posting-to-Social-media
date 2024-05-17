@@ -18,6 +18,7 @@ This project implements a basic backend for managing social media posts using C+
 
 - **Saving Posts to a File**: 
   Upon ending the program, it saves all post information to a text file.
+-##Canva Presentation https://www.canva.com/design/DAGFeDW1VtM/enL84GPBJ-KY9eUjDNkIfw/view?utm_content=DAGFeDW1VtM&utm_campaign=designshare&utm_medium=link&utm_source=editor##
 
   Choose an option:
 1. Add New Post
