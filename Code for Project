@@ -114,6 +114,39 @@ void savePostsToFile(const stack<Post>& posts) {
     cout << "Posts saved to posts.txt" << endl;
 }
 
+void listPosts(stack<Post>& posts) {
+    stack<Post> newPost;
+    vector<Post> allPosts;
+
+    while (!posts.empty()) {
+        Post currPost = posts.top();
+        posts.pop();
+        allPosts.push_back(currPost);
+        newPost.push(currPost);
+    }
+
+    while (!newPost.empty()) {
+        posts.push(newPost.top());
+        newPost.pop();
+    }
+
+    if (allPosts.empty()) {
+        cout << "There are no posts..." << endl;
+        return;
+    }
+
+    for (size_t i = 0; i < allPosts.size(); ++i) {
+        const Post& currPost = allPosts[allPosts.size() - 1 - i];
+        cout << "Post " << i + 1 << ":" << endl;
+        cout << "Image: " << currPost.name << endl;
+        cout << "Size: " << currPost.size << endl;
+        cout << "Posted by: " << currPost.poster << endl;
+        cout << "Timestamp: " << asctime(localtime(&currPost.timestamp));
+        cout << "Location: " << currPost.location << endl;
+        cout << endl;
+    }
+}
+
 int main() {
     stack<Post> posts;
     char choice;
@@ -124,7 +157,8 @@ int main() {
         cout << "1. Add New Post" << endl;
         cout << "2. Find Post" << endl;
         cout << "3. Delete Post" << endl;
-        cout << "4. Turn Off" << endl;
+        cout << "4. List of All Posts" << endl;
+        cout << "5. Turn Off" << endl; 
         cin >> choice;
         
         switch(choice) {
@@ -140,13 +174,17 @@ int main() {
                 deletePost(posts);
                 break;
             case '4':
+                listPosts(posts);
+                break;
+            case '5':
                 cout << "Exiting...!" << endl;
                 savePostsToFile(posts);
                 break;
             default:
                 cout << "Invalid choice. Please try again!" << endl;
         }
-    } while (choice != '4');
+    } while (choice != '5');
 
     return 0;
 }
+
