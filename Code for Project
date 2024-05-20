@@ -1,0 +1,152 @@
+#include <iostream>
+#include <stack>
+#include <ctime>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+struct Post {
+    string name;
+    int size;
+    string poster;
+    time_t timestamp;
+    string location;
+};
+
+void addPost(stack<Post>& posts) {
+    Post newImage;
+    cout << "Enter Image Name: ";
+    cin >> newImage.name;
+    cout << "Enter Image Size: ";
+    cin >> newImage.size;
+    cout << "Poster Name: ";
+    cin >> newImage.poster;
+    newImage.timestamp = time(0);
+    cout << "Enter Image Location: ";
+    cin >> newImage.location;
+    cout << endl;
+    posts.push(newImage);
+    cout << "Post saved successfully" << endl;
+}
+
+void findPost(stack<Post>& posts, string posterName) {
+    bool found = false;
+    stack<Post> tempStack;
+    vector<Post> foundPosts;  
+    while (!posts.empty()) {
+        Post currPost = posts.top();
+        posts.pop();
+        if (currPost.poster == posterName) {
+            foundPosts.push_back(currPost);
+            found = true;
+        }
+        tempStack.push(currPost);
+    }
+
+    while (!tempStack.empty()) {
+        posts.push(tempStack.top());
+        tempStack.pop();
+    }
+
+    if (!found) {
+        cout << "No posts found for user " << posterName << endl;
+        return;
+    }
+    for (size_t i = 0; i < foundPosts.size(); ++i) {
+        Post& currPost = foundPosts[i];
+        cout << "Post " << i + 1 << ":" << endl;
+        cout << "Image: " << currPost.name << endl;
+        cout << "Size: " << currPost.size << endl;
+        cout << "Posted by: " << currPost.poster << endl;
+        cout << "Timestamp: " << asctime(localtime(&currPost.timestamp));
+        cout << "Location: " << currPost.location << endl;
+        cout << endl;
+        
+        cout << "Do you want to delete this post? (y/n): ";
+        char action;
+        cin >> action;
+        if (action == 'y' || action == 'Y') {
+            stack<Post> tempStack;
+            bool deleted = false;
+            while (!posts.empty()) {
+                Post tempPost = posts.top();
+                posts.pop();
+                if (!deleted && tempPost.name == currPost.name && tempPost.timestamp == currPost.timestamp) {
+                    deleted = true;
+                    cout << "Post deleted successfully!" << endl;
+                } else {
+                    tempStack.push(tempPost);
+                }
+            }
+            while (!tempStack.empty()) {
+                posts.push(tempStack.top());
+                tempStack.pop();
+            }
+        }
+    }
+}
+
+void deletePost(stack<Post>& posts) {
+    if (posts.empty()) {
+        cout << "No posts to delete!" << endl;
+    } else {
+        posts.pop();
+        cout << "Most recent post deleted!" << endl;
+    }
+}
+void savePostsToFile(const stack<Post>& posts) {
+    ofstream outFile("posts.txt");
+    stack<Post> tempStack = posts;
+
+    while (!tempStack.empty()) {
+        Post currPost = tempStack.top();
+        tempStack.pop();
+        outFile << "Image: " << currPost.name << endl;
+        outFile << "Size: " << currPost.size << endl;
+        outFile << "Posted by: " << currPost.poster << endl;
+        outFile << "Timestamp: " << asctime(localtime(&currPost.timestamp));
+        outFile << "Location: " << currPost.location << endl;
+        outFile << endl;
+    }
+
+    outFile.close();
+    cout << "Posts saved to posts.txt" << endl;
+}
+
+int main() {
+    stack<Post> posts;
+    char choice;
+    string posterName;
+    
+    do {
+        cout << "Choose an option: " << endl;
+        cout << "1. Add New Post" << endl;
+        cout << "2. Find Post" << endl;
+        cout << "3. Delete Post" << endl;
+        cout << "4. Turn Off" << endl;
+        cin >> choice;
+        
+        switch(choice) {
+            case '1':
+                addPost(posts);
+                break;
+            case '2':
+                cout << "Enter Poster Name: ";
+                cin >> posterName;
+                findPost(posts, posterName);
+                break;
+            case '3':
+                deletePost(posts);
+                break;
+            case '4':
+                cout << "Exiting...!" << endl;
+                savePostsToFile(posts);
+                break;
+            default:
+                cout << "Invalid choice. Please try again!" << endl;
+        }
+    } while (choice != '4');
+
+    return 0;
+}
